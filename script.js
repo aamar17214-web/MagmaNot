@@ -2,7 +2,7 @@ import "./firebase.js";
 
 
 // ========================================
-// عناصر واجهة المستخدم
+// عناصر تسجيل الدخول
 // ========================================
 
 const loginSection =
@@ -41,6 +41,10 @@ const saveProfileButton =
     document.getElementById("saveProfileButton");
 
 
+// ========================================
+// عناصر الدردشة
+// ========================================
+
 const messageInput =
     document.getElementById("messageInput");
 
@@ -50,6 +54,10 @@ const sendMessageBtn =
 const messagesBox =
     document.getElementById("messagesBox");
 
+
+// ========================================
+// السيرفرات
+// ========================================
 
 const serverModal =
     document.getElementById("serverModal");
@@ -80,20 +88,47 @@ const copyInvite =
 
 
 // ========================================
+// إعدادات الحساب
+// ========================================
+
+const settingsButton =
+    document.getElementById("settingsButton");
+
+const settingsModal =
+    document.getElementById("settingsModal");
+
+const settingsUsername =
+    document.getElementById("settingsUsername");
+
+const settingsAvatar =
+    document.getElementById("settingsAvatar");
+
+const saveSettingsButton =
+    document.getElementById("saveSettingsButton");
+
+const closeSettingsButton =
+    document.getElementById("closeSettingsButton");
+
+
+// ========================================
 // معلومات المستخدم
 // ========================================
 
-let currentUsername = "عضو مجهول";
+let currentUsername =
+    "عضو مجهول";
 
-let avatarURL = "";
+let avatarURL =
+    "";
 
-let currentServerId = "general";
+let currentServerId =
+    "general";
 
-let chatInitialized = false;
+let chatInitialized =
+    false;
 
 
 // ========================================
-// ضغط الصورة
+// ضغط الصور
 // ========================================
 
 function compressImage(file) {
@@ -101,12 +136,13 @@ function compressImage(file) {
     return new Promise((resolve, reject) => {
 
         if (!file) {
+
             resolve("");
+
             return;
         }
 
 
-        // الحد الأقصى لحجم الصورة قبل الرفع
         if (file.size > 5 * 1024 * 1024) {
 
             reject(
@@ -139,7 +175,8 @@ function compressImage(file) {
                             );
 
 
-                        const maxSize = 300;
+                        const maxSize =
+                            300;
 
 
                         let width =
@@ -238,6 +275,7 @@ function compressImage(file) {
 
 
         reader.readAsDataURL(file);
+
     });
 }
 
@@ -259,7 +297,7 @@ registerButton.onclick =
         if (!email || !password) {
 
             alert(
-                "يرجى كتابة البريد الإلكتروني وكلمة المرور أولاً!"
+                "يرجى كتابة البريد الإلكتروني وكلمة المرور."
             );
 
             return;
@@ -269,7 +307,7 @@ registerButton.onclick =
         if (password.length < 6) {
 
             alert(
-                "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل!"
+                "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل."
             );
 
             return;
@@ -321,7 +359,7 @@ loginButton.onclick =
         if (!email || !password) {
 
             alert(
-                "يرجى كتابة البريد الإلكتروني وكلمة المرور!"
+                "يرجى كتابة البريد الإلكتروني وكلمة المرور."
             );
 
             return;
@@ -350,7 +388,7 @@ loginButton.onclick =
 
 
 // ========================================
-// حفظ الملف الشخصي
+// حفظ الملف الشخصي لأول مرة
 // ========================================
 
 saveProfileButton.onclick =
@@ -363,7 +401,7 @@ saveProfileButton.onclick =
         if (!name) {
 
             alert(
-                "من فضلك اكتب اسم المستخدم الخاص بك!"
+                "من فضلك اكتب اسم المستخدم."
             );
 
             return;
@@ -373,7 +411,7 @@ saveProfileButton.onclick =
         if (name.length < 2) {
 
             alert(
-                "اسم المستخدم يجب أن يحتوي على حرفين على الأقل!"
+                "اسم المستخدم يجب أن يحتوي على حرفين على الأقل."
             );
 
             return;
@@ -387,7 +425,7 @@ saveProfileButton.onclick =
         if (!user) {
 
             alert(
-                "لم يتم العثور على الحساب. حاول تسجيل الدخول مرة أخرى."
+                "لم يتم العثور على الحساب."
             );
 
             return;
@@ -403,7 +441,8 @@ saveProfileButton.onclick =
                 "جاري الحفظ...";
 
 
-            let image = "";
+            let image =
+                "";
 
 
             if (
@@ -417,8 +456,6 @@ saveProfileButton.onclick =
             }
 
 
-            // حفظ بيانات المستخدم في Firestore
-
             await window.setDoc(
 
                 window.doc(
@@ -429,11 +466,8 @@ saveProfileButton.onclick =
 
                 {
                     username: name,
-
                     avatar: image,
-
                     email: user.email,
-
                     createdAt: Date.now()
                 }
             );
@@ -464,7 +498,6 @@ saveProfileButton.onclick =
                 "حدث خطأ أثناء حفظ الحساب:\n" +
                 e.message
             );
-
 
         } finally {
 
@@ -540,7 +573,167 @@ async function loadUserProfile(user) {
 
 
 // ========================================
-// مراقبة حالة تسجيل الدخول
+// فتح إعدادات الحساب
+// ========================================
+
+settingsButton.onclick =
+    () => {
+
+        settingsUsername.value =
+            currentUsername;
+
+        settingsAvatar.value =
+            "";
+
+        settingsModal.style.display =
+            "flex";
+    };
+
+
+// ========================================
+// إغلاق إعدادات الحساب
+// ========================================
+
+closeSettingsButton.onclick =
+    () => {
+
+        settingsModal.style.display =
+            "none";
+    };
+
+
+// ========================================
+// حفظ إعدادات الحساب
+// ========================================
+
+saveSettingsButton.onclick =
+    async () => {
+
+        const newName =
+            settingsUsername.value.trim();
+
+
+        if (!newName) {
+
+            alert(
+                "اكتب اسم المستخدم."
+            );
+
+            return;
+        }
+
+
+        if (newName.length < 2) {
+
+            alert(
+                "اسم المستخدم يجب أن يحتوي على حرفين على الأقل."
+            );
+
+            return;
+        }
+
+
+        const user =
+            window.auth.currentUser;
+
+
+        if (!user) {
+
+            alert(
+                "يجب تسجيل الدخول أولاً."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            saveSettingsButton.disabled =
+                true;
+
+            saveSettingsButton.innerText =
+                "جاري الحفظ...";
+
+
+            let newAvatar =
+                avatarURL;
+
+
+            if (
+                settingsAvatar.files.length > 0
+            ) {
+
+                newAvatar =
+                    await compressImage(
+                        settingsAvatar.files[0]
+                    );
+            }
+
+
+            await window.setDoc(
+
+                window.doc(
+                    window.db,
+                    "users",
+                    user.uid
+                ),
+
+                {
+                    username: newName,
+                    avatar: newAvatar,
+                    email: user.email
+                },
+
+                {
+                    merge: true
+                }
+            );
+
+
+            currentUsername =
+                newName;
+
+            avatarURL =
+                newAvatar;
+
+
+            settingsModal.style.display =
+                "none";
+
+
+            settingsAvatar.value =
+                "";
+
+
+            alert(
+                "✅ تم تحديث الحساب بنجاح!"
+            );
+
+
+        } catch (e) {
+
+            console.error(e);
+
+            alert(
+                "حدث خطأ أثناء تحديث الحساب:\n" +
+                e.message
+            );
+
+
+        } finally {
+
+            saveSettingsButton.disabled =
+                false;
+
+            saveSettingsButton.innerText =
+                "💾 حفظ التغييرات";
+        }
+    };
+
+
+// ========================================
+// مراقبة تسجيل الدخول
 // ========================================
 
 window.onAuthStateChanged(
@@ -572,8 +765,6 @@ window.onAuthStateChanged(
             );
 
 
-        // حساب جديد لم يكمل معلوماته
-
         if (!profileExists) {
 
             authBox.style.display =
@@ -591,8 +782,6 @@ window.onAuthStateChanged(
             return;
         }
 
-
-        // المستخدم لديه ملف شخصي
 
         loginSection.style.display =
             "none";
@@ -616,7 +805,8 @@ async function sendMyMessage() {
         messageInput.value.trim();
 
 
-    if (!text) return;
+    if (!text)
+        return;
 
 
     try {
@@ -629,7 +819,6 @@ async function sendMyMessage() {
             ),
 
             {
-
                 user:
                     currentUsername,
 
@@ -654,10 +843,7 @@ async function sendMyMessage() {
 
     } catch (e) {
 
-        console.error(
-            "خطأ في إرسال الرسالة:",
-            e
-        );
+        console.error(e);
 
         alert(
             "لم يتم إرسال الرسالة."
@@ -749,8 +935,6 @@ function initLiveChat() {
                         "message";
 
 
-                    // صورة المستخدم
-
                     let avatarHTML =
                         "";
 
@@ -813,7 +997,6 @@ function initLiveChat() {
 
                         </div>
 
-
                         <div
                             style="
                                 margin-top:5px;
@@ -845,7 +1028,7 @@ function initLiveChat() {
 
 
 // ========================================
-// حماية الرسائل
+// حماية النصوص
 // ========================================
 
 function escapeHTML(text) {
@@ -915,7 +1098,7 @@ copyInvite.onclick =
 
 
         alert(
-            "📋 تم نسخ رابط الدعوة الخاص بسيرفرك!"
+            "📋 تم نسخ رابط الدعوة!"
         );
     };
 
@@ -934,7 +1117,7 @@ createServer.onclick =
         if (!name) {
 
             alert(
-                "اكتب اسم السيرفر"
+                "اكتب اسم السيرفر."
             );
 
             return;
