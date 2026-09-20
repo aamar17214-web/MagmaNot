@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>MAGMANOT</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- شاشة الحسابات والدخول -->
-    <div id="loginSection" class="auth-container">
+    <!-- =========================
+         تسجيل الدخول
+    ========================== -->
+
+    <section id="loginSection" class="auth-container">
 
         <h1>🎮 MAGMANOT</h1>
 
         <div id="authBox">
+
             <h2>تسجيل الدخول / التسجيل</h2>
 
             <input
@@ -23,30 +30,36 @@
                 placeholder="البريد الإلكتروني"
             >
 
-            <br><br>
-
             <input
                 type="password"
                 id="password"
                 placeholder="كلمة المرور"
             >
 
-            <br><br>
+            <div class="auth-buttons">
 
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button id="loginButton">دخول</button>
+                <button id="loginButton">
+                    دخول
+                </button>
 
                 <button
                     id="registerButton"
-                    style="background:#43b581;"
+                    class="green-button"
                 >
                     حساب جديد
                 </button>
+
             </div>
+
         </div>
 
-        <!-- إكمال بيانات الحساب -->
-        <div id="profileBox" style="display:none;">
+
+        <!-- إكمال الحساب -->
+
+        <div
+            id="profileBox"
+            style="display:none;"
+        >
 
             <h2>إكمال بيانات الحساب</h2>
 
@@ -56,11 +69,9 @@
                 placeholder="اسم المستخدم"
             >
 
-            <br><br>
-
-            <label>اختر صورة الحساب:</label>
-
-            <br><br>
+            <label>
+                اختر صورة الحساب:
+            </label>
 
             <input
                 type="file"
@@ -68,23 +79,27 @@
                 accept="image/*"
             >
 
-            <br><br>
-
             <button id="saveProfileButton">
                 دخول للموقع
             </button>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- واجهة التطبيق -->
+
+    <!-- =========================
+         التطبيق
+    ========================== -->
+
     <div
         class="app"
         id="appSection"
         style="display:none;"
     >
+
+        <!-- السيرفرات -->
 
         <aside class="servers">
 
@@ -100,11 +115,31 @@
         </aside>
 
 
+
+        <!-- الدردشة -->
+
         <main class="chat">
 
             <header id="channelTitle">
-                # عام
+
+                <span>
+                    # عام
+                </span>
+
+                <!-- زر الإعدادات -->
+
+                <button
+                    id="settingsButton"
+                    title="إعدادات الحساب"
+                >
+                    ⚙️
+                </button>
+
             </header>
+
+
+
+            <!-- الرسائل -->
 
             <div
                 class="messages"
@@ -113,17 +148,21 @@
 
                 <div class="message">
 
-                    <b>Admin (عمر مهباوي)</b>
+                    <b>
+                        Admin
+                    </b>
 
                     <p>
-                        مرحباً بكم في أول تطبيق من صنعي!
-                        نعتذر عن أي أخطاء.
+                        مرحباً بكم في MAGMANOT! 🎮
                     </p>
 
                 </div>
 
             </div>
 
+
+
+            <!-- إرسال الرسائل -->
 
             <div class="input-area">
 
@@ -144,60 +183,54 @@
     </div>
 
 
-    <!-- إنشاء سيرفر -->
+
+    <!-- =========================
+         نافذة إعدادات الحساب
+    ========================== -->
+
     <div
-        id="serverModal"
+        id="settingsModal"
         class="modal"
+        style="display:none;"
     >
 
         <div class="modal-content">
 
-            <h2>إنشاء سيرفر جديد</h2>
+            <h2>
+                ⚙️ إعدادات الحساب
+            </h2>
+
+
+            <label>
+                اسم المستخدم
+            </label>
 
             <input
                 type="text"
-                id="serverName"
-                placeholder="اسم السيرفر"
+                id="settingsUsername"
+                placeholder="اسم المستخدم"
             >
 
-            <br><br>
 
-            <label>صورة السيرفر:</label>
-
-            <br>
+            <label>
+                تغيير صورة الحساب
+            </label>
 
             <input
                 type="file"
-                id="serverImage"
+                id="settingsAvatar"
                 accept="image/*"
             >
 
-            <br><br>
 
-            <button id="createServer">
-                إنشاء السيرفر
+            <button id="saveSettingsButton">
+                💾 حفظ التغييرات
             </button>
 
-            <br><br>
-
-            <input
-                type="text"
-                id="inviteLink"
-                placeholder="سيظهر كود الدعوة هنا"
-                readonly
-            >
-
-            <br><br>
-
-            <button id="copyInvite">
-                📋 نسخ كود الدعوة
-            </button>
-
-            <br><br>
 
             <button
-                id="closeModal"
-                style="background-color:#f44336;"
+                id="closeSettingsButton"
+                class="red-button"
             >
                 إغلاق
             </button>
@@ -207,8 +240,80 @@
     </div>
 
 
+
+    <!-- =========================
+         إنشاء سيرفر
+    ========================== -->
+
+    <div
+        id="serverModal"
+        class="modal"
+        style="display:none;"
+    >
+
+        <div class="modal-content">
+
+            <h2>
+                إنشاء سيرفر جديد
+            </h2>
+
+
+            <input
+                type="text"
+                id="serverName"
+                placeholder="اسم السيرفر"
+            >
+
+
+            <label>
+                صورة السيرفر
+            </label>
+
+            <input
+                type="file"
+                id="serverImage"
+                accept="image/*"
+            >
+
+
+            <button id="createServer">
+                إنشاء السيرفر
+            </button>
+
+
+            <input
+                type="text"
+                id="inviteLink"
+                placeholder="سيظهر رابط الدعوة هنا"
+                readonly
+            >
+
+
+            <button id="copyInvite">
+                📋 نسخ رابط الدعوة
+            </button>
+
+
+            <button
+                id="closeModal"
+                class="red-button"
+            >
+                إغلاق
+            </button>
+
+        </div>
+
+    </div>
+
+
+
     <!-- JavaScript -->
-    <script type="module" src="script.js"></script>
+
+    <script
+        type="module"
+        src="script.js"
+    ></script>
 
 </body>
+
 </html>
