@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAGMANOT</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- شاشة الحسابات والدخول -->
+    <div id="loginSection" class="auth-container">
+
+        <h1>🎮 MAGMANOT</h1>
+
+        <div id="authBox">
+            <h2>تسجيل الدخول / التسجيل</h2>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="البريد الإلكتروني"
+            >
+
+            <br><br>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="كلمة المرور"
+            >
+
+            <br><br>
+
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="loginButton">دخول</button>
+
+                <button
+                    id="registerButton"
+                    style="background:#43b581;"
+                >
+                    حساب جديد
+                </button>
+            </div>
+        </div>
+
+        <!-- إكمال بيانات الحساب -->
+        <div id="profileBox" style="display:none;">
+
+            <h2>إكمال بيانات الحساب</h2>
+
+            <input
+                type="text"
+                id="username"
+                placeholder="اسم المستخدم"
+            >
+
+            <br><br>
+
+            <label>اختر صورة الحساب:</label>
+
+            <br><br>
+
+            <input
+                type="file"
+                id="avatar"
+                accept="image/*"
+            >
+
+            <br><br>
+
+            <button id="saveProfileButton">
+                دخول للموقع
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- واجهة التطبيق -->
+    <div
+        class="app"
+        id="appSection"
+        style="display:none;"
+    >
+
+        <aside class="servers">
+
+            <button
+                id="addServer"
+                title="إنشاء سيرفر"
+            >
+                +
+            </button>
+
+            <div id="serverList"></div>
+
+        </aside>
+
+
+        <main class="chat">
+
+            <header id="channelTitle">
+                # عام
+            </header>
+
+            <div
+                class="messages"
+                id="messagesBox"
+            >
+
+                <div class="message">
+
+                    <b>Admin (عمر مهباوي)</b>
+
+                    <p>
+                        مرحباً بكم في أول تطبيق من صنعي!
+                        نعتذر عن أي أخطاء.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="input-area">
+
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="اكتب رسالة..."
+                >
+
+                <button id="sendMessageBtn">
+                    إرسال
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- إنشاء سيرفر -->
+    <div
+        id="serverModal"
+        class="modal"
+    >
+
+        <div class="modal-content">
+
+            <h2>إنشاء سيرفر جديد</h2>
+
+            <input
+                type="text"
+                id="serverName"
+                placeholder="اسم السيرفر"
+            >
+
+            <br><br>
+
+            <label>صورة السيرفر:</label>
+
+            <br>
+
+            <input
+                type="file"
+                id="serverImage"
+                accept="image/*"
+            >
+
+            <br><br>
+
+            <button id="createServer">
+                إنشاء السيرفر
+            </button>
+
+            <br><br>
+
+            <input
+                type="text"
+                id="inviteLink"
+                placeholder="سيظهر كود الدعوة هنا"
+                readonly
+            >
+
+            <br><br>
+
+            <button id="copyInvite">
+                📋 نسخ كود الدعوة
+            </button>
+
+            <br><br>
+
+            <button
+                id="closeModal"
+                style="background-color:#f44336;"
+            >
+                إغلاق
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
