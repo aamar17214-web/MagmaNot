@@ -15,19 +15,18 @@ import {
     onSnapshot,
     query,
     orderBy,
+    where,
     doc,
     setDoc,
-    getDoc
+    getDoc,
+    getDocs,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 import {
     getStorage
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-storage.js";
 
-
-// ========================================
-// إعدادات Firebase
-// ========================================
 
 const firebaseConfig = {
     apiKey: "AIzaSyAix5FXyBfTxRkOob-oD5NXjqHise_EvZA",
@@ -39,17 +38,7 @@ const firebaseConfig = {
     measurementId: "G-Y99PVRCSTM"
 };
 
-
-// ========================================
-// تشغيل Firebase
-// ========================================
-
 const app = initializeApp(firebaseConfig);
-
-
-// ========================================
-// Authentication
-// ========================================
 
 window.auth = getAuth(app);
 
@@ -66,45 +55,21 @@ window.signOut =
     signOut;
 
 
-// ========================================
-// Firestore
-// ========================================
-
 window.db = getFirestore(app);
 
-window.collection =
-    collection;
-
-window.addDoc =
-    addDoc;
-
-window.onSnapshot =
-    onSnapshot;
-
-window.query =
-    query;
-
-window.orderBy =
-    orderBy;
-
-window.doc =
-    doc;
-
-window.setDoc =
-    setDoc;
-
-window.getDoc =
-    getDoc;
+window.collection = collection;
+window.addDoc = addDoc;
+window.onSnapshot = onSnapshot;
+window.query = query;
+window.orderBy = orderBy;
+window.where = where;
+window.doc = doc;
+window.setDoc = setDoc;
+window.getDoc = getDoc;
+window.getDocs = getDocs;
+window.serverTimestamp = serverTimestamp;
 
 
-// ========================================
-// Firebase Storage
-// ========================================
+window.storage = getStorage(app);
 
-window.storage =
-    getStorage(app);
-
-
-console.log(
-    "Firebase + Authentication + Firestore + Storage متصل بنجاح 🚀"
-);
+console.log("Firebase متصل بنجاح 🚀");
