@@ -1,7 +1,8 @@
+```javascript
 import "./firebase.js";
 
 // ========================================
-// عناصر واجهة المستخدم
+// عناصر الواجهة
 // ========================================
 
 const loginSection = document.getElementById("loginSection");
@@ -23,7 +24,6 @@ const messageInput = document.getElementById("messageInput");
 const sendMessageBtn = document.getElementById("sendMessageBtn");
 const messagesBox = document.getElementById("messagesBox");
 
-// السيرفر
 const serverModal = document.getElementById("serverModal");
 const addServer = document.getElementById("addServer");
 const createServer = document.getElementById("createServer");
@@ -34,7 +34,6 @@ const serverList = document.getElementById("serverList");
 const inviteLink = document.getElementById("inviteLink");
 const copyInvite = document.getElementById("copyInvite");
 
-// الإعدادات
 const settingsButton = document.getElementById("settingsButton");
 const settingsModal = document.getElementById("settingsModal");
 const closeSettingsButton = document.getElementById("closeSettingsButton");
@@ -48,14 +47,24 @@ const settingsAvatar = document.getElementById("settingsAvatar");
 
 let currentUsername = "عضو مجهول";
 let avatarURL = "";
+
+let currentUser = null;
+
 let currentServerId = "general";
+
 let chatInitialized = false;
 
+let currentDMUser = null;
+
+let dmUnsubscribe = null;
+
+
 // ========================================
-// ضغط الصورة
+// ضغط الصور
 // ========================================
 
 function compressImage(file) {
+
     return new Promise((resolve, reject) => {
 
         if (!file) {
@@ -78,7 +87,8 @@ function compressImage(file) {
 
             img.onload = () => {
 
-                const canvas = document.createElement("canvas");
+                const canvas =
+                    document.createElement("canvas");
 
                 const maxSize = 300;
 
@@ -88,14 +98,18 @@ function compressImage(file) {
                 if (width > height) {
 
                     if (width > maxSize) {
-                        height = height * (maxSize / width);
+                        height =
+                            height * (maxSize / width);
+
                         width = maxSize;
                     }
 
                 } else {
 
                     if (height > maxSize) {
-                        width = width * (maxSize / height);
+                        width =
+                            width * (maxSize / height);
+
                         height = maxSize;
                     }
                 }
@@ -103,7 +117,8 @@ function compressImage(file) {
                 canvas.width = width;
                 canvas.height = height;
 
-                const ctx = canvas.getContext("2d");
+                const ctx =
+                    canvas.getContext("2d");
 
                 ctx.drawImage(
                     img,
@@ -113,12 +128,12 @@ function compressImage(file) {
                     height
                 );
 
-                const compressed = canvas.toDataURL(
-                    "image/jpeg",
-                    0.7
+                resolve(
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.7
+                    )
                 );
-
-                resolve(compressed);
             };
 
             img.onerror = () => {
@@ -140,14 +155,18 @@ function compressImage(file) {
     });
 }
 
+
 // ========================================
 // إنشاء حساب
 // ========================================
 
 registerButton.onclick = async () => {
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value.trim();
 
     if (!email || !password) {
 
@@ -176,6 +195,7 @@ registerButton.onclick = async () => {
         );
 
         authBox.style.display = "none";
+
         profileBox.style.display = "block";
 
     } catch (e) {
@@ -189,14 +209,18 @@ registerButton.onclick = async () => {
     }
 };
 
+
 // ========================================
 // تسجيل الدخول
 // ========================================
 
 loginButton.onclick = async () => {
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value.trim();
 
     if (!email || !password) {
 
@@ -226,13 +250,15 @@ loginButton.onclick = async () => {
     }
 };
 
+
 // ========================================
 // حفظ الملف الشخصي
 // ========================================
 
 saveProfileButton.onclick = async () => {
 
-    const name = usernameInput.value.trim();
+    const name =
+        usernameInput.value.trim();
 
     if (!name) {
 
@@ -252,12 +278,13 @@ saveProfileButton.onclick = async () => {
         return;
     }
 
-    const user = window.auth.currentUser;
+    const user =
+        window.auth.currentUser;
 
     if (!user) {
 
         alert(
-            "لم يتم العثور على الحساب. حاول تسجيل الدخول مرة أخرى."
+            "لم يتم العثور على الحساب."
         );
 
         return;
@@ -266,7 +293,9 @@ saveProfileButton.onclick = async () => {
     try {
 
         saveProfileButton.disabled = true;
-        saveProfileButton.innerText = "جاري الحفظ...";
+
+        saveProfileButton.innerText =
+            "جاري الحفظ...";
 
         let image = "";
 
@@ -276,9 +305,10 @@ saveProfileButton.onclick = async () => {
             avatarInput.files.length > 0
         ) {
 
-            image = await compressImage(
-                avatarInput.files[0]
-            );
+            image =
+                await compressImage(
+                    avatarInput.files[0]
+                );
         }
 
         await window.setDoc(
@@ -289,6 +319,7 @@ saveProfileButton.onclick = async () => {
             ),
             {
                 username: name,
+                usernameLower: name.toLowerCase(),
                 avatar: image,
                 email: user.email,
                 createdAt: Date.now()
@@ -297,11 +328,14 @@ saveProfileButton.onclick = async () => {
 
         currentUsername = name;
         avatarURL = image;
+        currentUser = user;
 
         loginSection.style.display = "none";
         appSection.style.display = "flex";
 
         initLiveChat();
+
+        createFriendsUI();
 
     } catch (e) {
 
@@ -315,9 +349,12 @@ saveProfileButton.onclick = async () => {
     } finally {
 
         saveProfileButton.disabled = false;
-        saveProfileButton.innerText = "دخول للموقع";
+
+        saveProfileButton.innerText =
+            "دخول للموقع";
     }
 };
+
 
 // ========================================
 // تحميل بيانات المستخدم
@@ -327,27 +364,27 @@ async function loadUserProfile(user) {
 
     try {
 
-        const userRef = window.doc(
-            window.db,
-            "users",
-            user.uid
-        );
+        const userRef =
+            window.doc(
+                window.db,
+                "users",
+                user.uid
+            );
 
-        const userSnap = await window.getDoc(
-            userRef
-        );
+        const userSnap =
+            await window.getDoc(userRef);
 
         if (userSnap.exists()) {
 
-            const data = userSnap.data();
+            const data =
+                userSnap.data();
 
             currentUsername =
                 data.username ||
                 user.email.split("@")[0];
 
             avatarURL =
-                data.avatar ||
-                "";
+                data.avatar || "";
 
             return true;
         }
@@ -368,8 +405,9 @@ async function loadUserProfile(user) {
     return false;
 }
 
+
 // ========================================
-// مراقبة حالة تسجيل الدخول
+// حالة تسجيل الدخول
 // ========================================
 
 window.onAuthStateChanged(
@@ -379,13 +417,20 @@ window.onAuthStateChanged(
 
         if (!user) {
 
+            currentUser = null;
+
             loginSection.style.display = "flex";
+
             appSection.style.display = "none";
+
             authBox.style.display = "block";
+
             profileBox.style.display = "none";
 
             return;
         }
+
+        currentUser = user;
 
         const profileExists =
             await loadUserProfile(user);
@@ -393,27 +438,42 @@ window.onAuthStateChanged(
         if (!profileExists) {
 
             authBox.style.display = "none";
+
             profileBox.style.display = "block";
+
             loginSection.style.display = "flex";
+
             appSection.style.display = "none";
 
             return;
         }
 
         loginSection.style.display = "none";
+
         appSection.style.display = "flex";
 
         initLiveChat();
+
+        createFriendsUI();
     }
 );
 
+
 // ========================================
-// إرسال رسالة
+// إرسال رسالة عامة
 // ========================================
 
 async function sendMyMessage() {
 
-    const text = messageInput.value.trim();
+    if (currentDMUser) {
+
+        await sendDM();
+
+        return;
+    }
+
+    const text =
+        messageInput.value.trim();
 
     if (!text) return;
 
@@ -437,10 +497,7 @@ async function sendMyMessage() {
 
     } catch (e) {
 
-        console.error(
-            "خطأ في إرسال الرسالة:",
-            e
-        );
+        console.error(e);
 
         alert(
             "لم يتم إرسال الرسالة."
@@ -448,7 +505,10 @@ async function sendMyMessage() {
     }
 }
 
-sendMessageBtn.onclick = sendMyMessage;
+
+sendMessageBtn.onclick =
+    sendMyMessage;
+
 
 messageInput.onkeydown = (e) => {
 
@@ -457,8 +517,9 @@ messageInput.onkeydown = (e) => {
     }
 };
 
+
 // ========================================
-// تحميل الرسائل
+// الشات العام
 // ========================================
 
 function initLiveChat() {
@@ -484,14 +545,18 @@ function initLiveChat() {
 
     window.onSnapshot(
         q,
+
         (snapshot) => {
+
+            if (currentDMUser) return;
 
             messagesBox.innerHTML = "";
 
             snapshot.forEach(
-                (doc) => {
+                (messageDoc) => {
 
-                    const data = doc.data();
+                    const data =
+                        messageDoc.data();
 
                     if (
                         data.server !==
@@ -500,84 +565,8 @@ function initLiveChat() {
                         return;
                     }
 
-                    const message =
-                        document.createElement(
-                            "div"
-                        );
-
-                    message.className = "message";
-
-                    let avatarHTML = "";
-
-                    if (data.avatar) {
-
-                        avatarHTML = `
-                            <img
-                                src="${data.avatar}"
-                                style="
-                                    width:40px;
-                                    height:40px;
-                                    border-radius:50%;
-                                    object-fit:cover;
-                                    vertical-align:middle;
-                                    margin-left:8px;
-                                "
-                            >
-                        `;
-
-                    } else {
-
-                        avatarHTML = `
-                            <div
-                                style="
-                                    display:inline-flex;
-                                    width:40px;
-                                    height:40px;
-                                    border-radius:50%;
-                                    background:#5865F2;
-                                    color:white;
-                                    align-items:center;
-                                    justify-content:center;
-                                    vertical-align:middle;
-                                    margin-left:8px;
-                                "
-                            >
-                                👤
-                            </div>
-                        `;
-                    }
-
-                    message.innerHTML = `
-
-                        <div>
-
-                            ${avatarHTML}
-
-                            <b>
-                                ${escapeHTML(
-                                    data.user ||
-                                    "عضو مجهول"
-                                )}
-                            </b>
-
-                        </div>
-
-                        <div
-                            style="
-                                margin-top:5px;
-                            "
-                        >
-
-                            ${escapeHTML(
-                                data.text ||
-                                ""
-                            )}
-
-                        </div>
-                    `;
-
-                    messagesBox.appendChild(
-                        message
+                    renderMessage(
+                        data
                     );
                 }
             );
@@ -588,8 +577,89 @@ function initLiveChat() {
     );
 }
 
+
 // ========================================
-// حماية الرسائل
+// عرض رسالة
+// ========================================
+
+function renderMessage(data) {
+
+    const message =
+        document.createElement("div");
+
+    message.className =
+        "message";
+
+    let avatarHTML = "";
+
+    if (data.avatar) {
+
+        avatarHTML = `
+            <img
+                src="${escapeAttribute(data.avatar)}"
+                style="
+                    width:40px;
+                    height:40px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    vertical-align:middle;
+                    margin-left:8px;
+                "
+            >
+        `;
+
+    } else {
+
+        avatarHTML = `
+            <div
+                style="
+                    display:inline-flex;
+                    width:40px;
+                    height:40px;
+                    border-radius:50%;
+                    background:#5865F2;
+                    color:white;
+                    align-items:center;
+                    justify-content:center;
+                    vertical-align:middle;
+                    margin-left:8px;
+                "
+            >
+                👤
+            </div>
+        `;
+    }
+
+    message.innerHTML = `
+
+        <div>
+
+            ${avatarHTML}
+
+            <b>
+                ${escapeHTML(
+                    data.user ||
+                    "عضو مجهول"
+                )}
+            </b>
+
+        </div>
+
+        <div style="margin-top:5px;">
+
+            ${escapeHTML(
+                data.text || ""
+            )}
+
+        </div>
+    `;
+
+    messagesBox.appendChild(message);
+}
+
+
+// ========================================
+// حماية HTML
 // ========================================
 
 function escapeHTML(text) {
@@ -597,171 +667,641 @@ function escapeHTML(text) {
     const div =
         document.createElement("div");
 
-    div.textContent = text;
+    div.textContent =
+        text;
 
     return div.innerHTML;
 }
 
-// ========================================
-// فتح نافذة إنشاء السيرفر
-// ========================================
 
-if (addServer) {
+function escapeAttribute(text) {
 
-    addServer.onclick = () => {
-
-        if (!serverModal) return;
-
-        serverModal.style.display = "flex";
-
-        const code =
-            Math.random()
-                .toString(36)
-                .substring(2, 8)
-                .toUpperCase();
-
-        if (inviteLink) {
-
-            inviteLink.value =
-                window.location.origin +
-                window.location.pathname +
-                "?invite=" +
-                code;
-        }
-    };
+    return String(text)
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 }
 
+
 // ========================================
-// إغلاق نافذة السيرفر
+// واجهة الأصدقاء
 // ========================================
 
-function closeServerModal() {
+function createFriendsUI() {
 
-    if (serverModal) {
-        serverModal.style.display = "none";
+    if (
+        document.getElementById(
+            "friendsPanel"
+        )
+    ) {
+        return;
     }
-}
 
-if (closeModal) {
-    closeModal.onclick = closeServerModal;
-}
+    const panel =
+        document.createElement("div");
 
-// الضغط خارج النافذة يغلقها
-if (serverModal) {
+    panel.id =
+        "friendsPanel";
 
-    serverModal.addEventListener(
-        "click",
-        (event) => {
+    panel.style.cssText = `
+        position:fixed;
+        top:80px;
+        right:15px;
+        width:300px;
+        max-width:calc(100vw - 30px);
+        max-height:70vh;
+        overflow-y:auto;
+        background:#1b1e25;
+        border:1px solid #30343f;
+        border-radius:14px;
+        padding:15px;
+        z-index:9999;
+        box-shadow:0 10px 30px rgba(0,0,0,.45);
+        display:none;
+    `;
 
-            if (event.target === serverModal) {
-                closeServerModal();
-            }
-        }
-    );
-}
+    panel.innerHTML = `
 
-// زر Escape يغلق النافذة
-document.addEventListener(
-    "keydown",
-    (event) => {
+        <h3 style="margin-bottom:12px;">
+            👥 الأصدقاء
+        </h3>
 
-        if (
-            event.key === "Escape" &&
-            serverModal &&
-            serverModal.style.display !== "none"
-        ) {
-            closeServerModal();
-        }
-    }
-);
+        <div style="
+            display:flex;
+            gap:7px;
+            margin-bottom:12px;
+        ">
 
-// ========================================
-// نسخ رابط الدعوة
-// ========================================
+            <input
+                id="friendUsernameInput"
+                type="text"
+                placeholder="اسم المستخدم"
+                style="
+                    flex:1;
+                    min-width:0;
+                    padding:9px;
+                    border-radius:8px;
+                    border:1px solid #3a3e4a;
+                    background:#111318;
+                    color:white;
+                "
+            >
 
-if (copyInvite) {
+            <button
+                id="addFriendButton"
+                style="
+                    padding:9px;
+                    border:0;
+                    border-radius:8px;
+                    background:#5865f2;
+                    color:white;
+                    cursor:pointer;
+                "
+            >
+                إضافة
+            </button>
 
-    copyInvite.onclick = async () => {
+        </div>
 
-        if (!inviteLink) return;
+        <div id="friendsList">
+            جاري التحميل...
+        </div>
 
-        try {
+    `;
 
-            await navigator.clipboard.writeText(
-                inviteLink.value
-            );
+    document.body.appendChild(panel);
 
-            alert(
-                "📋 تم نسخ رابط الدعوة الخاص بسيرفرك!"
-            );
+    const button =
+        document.createElement("button");
 
-        } catch (e) {
+    button.id =
+        "friendsButton";
 
-            inviteLink.select();
-            document.execCommand("copy");
+    button.innerHTML =
+        "👥";
 
-            alert(
-                "📋 تم نسخ رابط الدعوة!"
-            );
-        }
+    button.title =
+        "الأصدقاء";
+
+    button.style.cssText = `
+        position:fixed;
+        top:15px;
+        right:15px;
+        width:45px;
+        height:45px;
+        border:0;
+        border-radius:12px;
+        background:#5865f2;
+        color:white;
+        font-size:20px;
+        cursor:pointer;
+        z-index:10000;
+    `;
+
+    document.body.appendChild(button);
+
+    button.onclick = () => {
+
+        panel.style.display =
+            panel.style.display === "none"
+                ? "block"
+                : "none";
+
+        loadFriends();
     };
+
+    document.getElementById(
+        "addFriendButton"
+    ).onclick =
+        addFriend;
+
+    loadFriends();
 }
 
+
 // ========================================
-// إنشاء السيرفر
+// إضافة صديق
 // ========================================
 
-if (createServer) {
+async function addFriend() {
 
-    createServer.onclick = async () => {
+    const input =
+        document.getElementById(
+            "friendUsernameInput"
+        );
 
-        const name =
-            serverName.value.trim();
+    const name =
+        input.value.trim();
 
-        if (!name) {
+    if (!name) {
+
+        alert(
+            "اكتب اسم المستخدم أولاً."
+        );
+
+        return;
+    }
+
+    if (
+        name.toLowerCase() ===
+        currentUsername.toLowerCase()
+    ) {
+
+        alert(
+            "لا يمكنك إضافة نفسك."
+        );
+
+        return;
+    }
+
+    try {
+
+        const usersRef =
+            window.collection(
+                window.db,
+                "users"
+            );
+
+        const q =
+            window.query(
+                usersRef,
+                window.where(
+                    "usernameLower",
+                    "==",
+                    name.toLowerCase()
+                )
+            );
+
+        const result =
+            await window.getDocs(q);
+
+        if (result.empty) {
 
             alert(
-                "اكتب اسم السيرفر"
+                "لم يتم العثور على هذا المستخدم."
             );
 
             return;
         }
 
-        const button =
-            document.createElement("button");
+        const friendDoc =
+            result.docs[0];
 
-        button.className =
-            "serverButton";
+        const friendData =
+            friendDoc.data();
 
-        button.innerText =
-            name.charAt(0).toUpperCase();
+        const friendUid =
+            friendDoc.id;
 
-        button.title = name;
-
-        serverList.appendChild(
-            button
+        await window.setDoc(
+            window.doc(
+                window.db,
+                "friends",
+                currentUser.uid,
+                "list",
+                friendUid
+            ),
+            {
+                uid: friendUid,
+                username:
+                    friendData.username || name,
+                avatar:
+                    friendData.avatar || "",
+                addedAt: Date.now()
+            }
         );
 
-        // إغلاق النافذة بعد الإنشاء
-        closeServerModal();
+        await window.setDoc(
+            window.doc(
+                window.db,
+                "friends",
+                friendUid,
+                "list",
+                currentUser.uid
+            ),
+            {
+                uid: currentUser.uid,
+                username: currentUsername,
+                avatar: avatarURL,
+                addedAt: Date.now()
+            }
+        );
 
-        serverName.value = "";
-
-        if (serverImage) {
-            serverImage.value = "";
-        }
+        input.value = "";
 
         alert(
-            "🎉 تم إنشاء السيرفر بنجاح!"
+            "✅ تمت إضافة الصديق!"
         );
-    };
+
+        loadFriends();
+
+    } catch (e) {
+
+        console.error(e);
+
+        alert(
+            "حدث خطأ أثناء إضافة الصديق:\n" +
+            e.message
+        );
+    }
 }
 
+
 // ========================================
-// الإعدادات
+// تحميل الأصدقاء
 // ========================================
 
-// فتح الإعدادات
+function loadFriends() {
+
+    if (!currentUser) return;
+
+    const list =
+        document.getElementById(
+            "friendsList"
+        );
+
+    if (!list) return;
+
+    const friendsRef =
+        window.collection(
+            window.db,
+            "friends",
+            currentUser.uid,
+            "list"
+        );
+
+    window.onSnapshot(
+        friendsRef,
+
+        (snapshot) => {
+
+            list.innerHTML = "";
+
+            if (snapshot.empty) {
+
+                list.innerHTML = `
+                    <div style="
+                        padding:10px;
+                        opacity:.7;
+                    ">
+                        لا يوجد أصدقاء بعد.
+                    </div>
+                `;
+
+                return;
+            }
+
+            snapshot.forEach(
+                (friendDoc) => {
+
+                    const data =
+                        friendDoc.data();
+
+                    const item =
+                        document.createElement(
+                            "button"
+                        );
+
+                    item.style.cssText = `
+                        width:100%;
+                        display:flex;
+                        align-items:center;
+                        gap:10px;
+                        padding:10px;
+                        margin-bottom:6px;
+                        border:0;
+                        border-radius:9px;
+                        background:#252832;
+                        color:white;
+                        cursor:pointer;
+                        text-align:right;
+                    `;
+
+                    const avatar =
+                        data.avatar
+                            ? `<img src="${escapeAttribute(data.avatar)}"
+                                style="
+                                    width:38px;
+                                    height:38px;
+                                    border-radius:50%;
+                                    object-fit:cover;
+                                ">`
+                            : `
+                                <div style="
+                                    width:38px;
+                                    height:38px;
+                                    border-radius:50%;
+                                    background:#5865f2;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                ">
+                                    👤
+                                </div>
+                            `;
+
+                    item.innerHTML = `
+                        ${avatar}
+                        <span>
+                            ${escapeHTML(
+                                data.username ||
+                                "مستخدم"
+                            )}
+                        </span>
+                    `;
+
+                    item.onclick = () => {
+
+                        openDM({
+                            uid: data.uid,
+                            username:
+                                data.username,
+                            avatar:
+                                data.avatar || ""
+                        });
+
+                    };
+
+                    list.appendChild(item);
+                }
+            );
+        }
+    );
+}
+
+
+// ========================================
+// فتح DM
+// ========================================
+
+function openDM(friend) {
+
+    currentDMUser =
+        friend;
+
+    if (dmUnsubscribe) {
+
+        dmUnsubscribe();
+
+        dmUnsubscribe = null;
+    }
+
+    const title =
+        document.querySelector(
+            "#channelTitle span"
+        );
+
+    if (title) {
+
+        title.innerHTML =
+            "💬 " +
+            escapeHTML(
+                friend.username
+            );
+    }
+
+    messageInput.placeholder =
+        "اكتب رسالة خاصة...";
+
+    messagesBox.innerHTML = `
+        <div style="
+            text-align:center;
+            opacity:.7;
+            padding:20px;
+        ">
+            المحادثة الخاصة مع
+            <b>
+                ${escapeHTML(
+                    friend.username
+                )}
+            </b>
+        </div>
+    `;
+
+    listenToDM(friend);
+}
+
+
+// ========================================
+// معرف المحادثة
+// ========================================
+
+function getDMId(uid1, uid2) {
+
+    return [uid1, uid2]
+        .sort()
+        .join("_");
+}
+
+
+// ========================================
+// الاستماع للرسائل الخاصة
+// ========================================
+
+function listenToDM(friend) {
+
+    const dmId =
+        getDMId(
+            currentUser.uid,
+            friend.uid
+        );
+
+    const messagesRef =
+        window.collection(
+            window.db,
+            "directMessages",
+            dmId,
+            "messages"
+        );
+
+    const q =
+        window.query(
+            messagesRef,
+            window.orderBy(
+                "time",
+                "asc"
+            )
+        );
+
+    dmUnsubscribe =
+        window.onSnapshot(
+            q,
+
+            (snapshot) => {
+
+                messagesBox.innerHTML = "";
+
+                snapshot.forEach(
+                    (messageDoc) => {
+
+                        const data =
+                            messageDoc.data();
+
+                        const message =
+                            document.createElement(
+                                "div"
+                            );
+
+                        message.className =
+                            "message";
+
+                        const mine =
+                            data.senderUid ===
+                            currentUser.uid;
+
+                        message.style.cssText += `
+                            ${mine
+                                ? "margin-right:auto;background:#5865f2;"
+                                : "margin-left:auto;background:#252832;"}
+                            max-width:80%;
+                        `;
+
+                        message.innerHTML = `
+
+                            <div>
+
+                                <b>
+                                    ${escapeHTML(
+                                        data.senderName ||
+                                        "مستخدم"
+                                    )}
+                                </b>
+
+                            </div>
+
+                            <div style="
+                                margin-top:5px;
+                            ">
+
+                                ${escapeHTML(
+                                    data.text || ""
+                                )}
+
+                            </div>
+                        `;
+
+                        messagesBox.appendChild(
+                            message
+                        );
+                    }
+                );
+
+                messagesBox.scrollTop =
+                    messagesBox.scrollHeight;
+            }
+        );
+}
+
+
+// ========================================
+// إرسال DM
+// ========================================
+
+async function sendDM() {
+
+    if (
+        !currentDMUser ||
+        !currentUser
+    ) {
+        return;
+    }
+
+    const text =
+        messageInput.value.trim();
+
+    if (!text) return;
+
+    try {
+
+        const dmId =
+            getDMId(
+                currentUser.uid,
+                currentDMUser.uid
+            );
+
+        await window.addDoc(
+            window.collection(
+                window.db,
+                "directMessages",
+                dmId,
+                "messages"
+            ),
+            {
+                senderUid:
+                    currentUser.uid,
+
+                receiverUid:
+                    currentDMUser.uid,
+
+                senderName:
+                    currentUsername,
+
+                text:
+                    text,
+
+                time:
+                    Date.now()
+            }
+        );
+
+        messageInput.value = "";
+
+    } catch (e) {
+
+        console.error(e);
+
+        alert(
+            "لم يتم إرسال الرسالة الخاصة:\n" +
+            e.message
+        );
+    }
+}
+
+
+// ========================================
+// إعدادات الحساب
+// ========================================
+
 if (settingsButton) {
 
     settingsButton.onclick = () => {
@@ -776,14 +1316,16 @@ if (settingsButton) {
     };
 }
 
-// إغلاق الإعدادات
+
 function closeSettings() {
 
     if (settingsModal) {
+
         settingsModal.style.display =
             "none";
     }
 }
+
 
 if (closeSettingsButton) {
 
@@ -791,11 +1333,12 @@ if (closeSettingsButton) {
         closeSettings;
 }
 
-// الضغط خارج الإعدادات يغلقها
+
 if (settingsModal) {
 
     settingsModal.addEventListener(
         "click",
+
         (event) => {
 
             if (
@@ -808,7 +1351,7 @@ if (settingsModal) {
     );
 }
 
-// حفظ الإعدادات
+
 if (saveSettingsButton) {
 
     saveSettingsButton.onclick =
@@ -856,11 +1399,17 @@ if (saveSettingsButton) {
                     "جاري الحفظ...";
 
                 const updateData = {
-                    username: name,
-                    email: user.email
+
+                    username:
+                        name,
+
+                    usernameLower:
+                        name.toLowerCase(),
+
+                    email:
+                        user.email
                 };
 
-                // إذا اختار صورة جديدة
                 if (
                     settingsAvatar &&
                     settingsAvatar.files &&
@@ -881,7 +1430,7 @@ if (saveSettingsButton) {
                     ),
                     updateData,
                     {
-                        merge: true
+                        merge:true
                     }
                 );
 
@@ -891,6 +1440,7 @@ if (saveSettingsButton) {
                 if (
                     updateData.avatar
                 ) {
+
                     avatarURL =
                         updateData.avatar;
                 }
@@ -921,20 +1471,187 @@ if (saveSettingsButton) {
         };
 }
 
+
 // ========================================
-// Escape يغلق الإعدادات أيضًا
+// إنشاء السيرفر
+// ========================================
+
+if (addServer) {
+
+    addServer.onclick = () => {
+
+        if (!serverModal) return;
+
+        serverModal.style.display =
+            "flex";
+
+        const code =
+            Math.random()
+                .toString(36)
+                .substring(2, 8)
+                .toUpperCase();
+
+        if (inviteLink) {
+
+            inviteLink.value =
+                window.location.origin +
+                window.location.pathname +
+                "?invite=" +
+                code;
+        }
+    };
+}
+
+
+function closeServerModal() {
+
+    if (serverModal) {
+
+        serverModal.style.display =
+            "none";
+    }
+}
+
+
+if (closeModal) {
+
+    closeModal.onclick =
+        closeServerModal;
+}
+
+
+if (serverModal) {
+
+    serverModal.addEventListener(
+        "click",
+
+        (event) => {
+
+            if (
+                event.target ===
+                serverModal
+            ) {
+                closeServerModal();
+            }
+        }
+    );
+}
+
+
+if (copyInvite) {
+
+    copyInvite.onclick =
+        async () => {
+
+            if (!inviteLink) return;
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    inviteLink.value
+                );
+
+                alert(
+                    "📋 تم نسخ رابط الدعوة!"
+                );
+
+            } catch (e) {
+
+                inviteLink.select();
+
+                document.execCommand(
+                    "copy"
+                );
+
+                alert(
+                    "📋 تم نسخ رابط الدعوة!"
+                );
+            }
+        };
+}
+
+
+if (createServer) {
+
+    createServer.onclick =
+        async () => {
+
+            const name =
+                serverName.value.trim();
+
+            if (!name) {
+
+                alert(
+                    "اكتب اسم السيرفر"
+                );
+
+                return;
+            }
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "serverButton";
+
+            button.innerText =
+                name
+                    .charAt(0)
+                    .toUpperCase();
+
+            button.title =
+                name;
+
+            serverList.appendChild(
+                button
+            );
+
+            closeServerModal();
+
+            serverName.value = "";
+
+            if (serverImage) {
+                serverImage.value = "";
+            }
+
+            alert(
+                "🎉 تم إنشاء السيرفر بنجاح!"
+            );
+        };
+}
+
+
+// ========================================
+// Escape
 // ========================================
 
 document.addEventListener(
     "keydown",
+
     (event) => {
 
         if (
-            event.key === "Escape" &&
-            settingsModal &&
-            settingsModal.style.display !== "none"
+            event.key === "Escape"
         ) {
-            closeSettings();
+
+            if (
+                settingsModal &&
+                settingsModal.style.display !==
+                "none"
+            ) {
+                closeSettings();
+            }
+
+            if (
+                serverModal &&
+                serverModal.style.display !==
+                "none"
+            ) {
+                closeServerModal();
+            }
         }
     }
 );
+``
