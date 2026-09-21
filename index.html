@@ -185,6 +185,40 @@
 
 
     <!-- =========================
+         نافذة الأصدقاء والرسائل الخاصة
+    ========================== -->
+
+    <div id="friendsModal" class="modal" style="display:none;">
+        <div class="modal-content friends-content">
+            <h2>👥 الأصدقاء</h2>
+            <div class="add-friend-row">
+                <input type="text" id="friendUsernameInput" placeholder="اسم المستخدم لإضافته">
+                <button id="addFriendButton">إضافة</button>
+            </div>
+            <div id="friendsList" class="friends-list"></div>
+            <button id="closeFriendsButton" class="red-button">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- =========================
+         نافذة الرسائل الخاصة
+    ========================== -->
+
+    <div id="dmModal" class="modal" style="display:none;">
+        <div class="modal-content dm-content">
+            <div class="dm-header">
+                <h2 id="dmTitle">💬 رسالة خاصة</h2>
+                <button id="closeDmButton" class="red-button">إغلاق</button>
+            </div>
+            <div id="dmMessages" class="dm-messages"></div>
+            <div class="input-area dm-input-area">
+                <input type="text" id="dmInput" placeholder="اكتب رسالة خاصة...">
+                <button id="sendDmButton">إرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
          نافذة إعدادات الحساب
     ========================== -->
 
